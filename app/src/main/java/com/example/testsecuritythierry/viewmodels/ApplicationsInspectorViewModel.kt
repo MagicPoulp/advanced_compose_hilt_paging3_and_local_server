@@ -3,6 +3,7 @@ package com.example.testsecuritythierry.viewmodels
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.*
+import com.example.testsecuritythierry.http.AnalysisResult
 import com.example.testsecuritythierry.repositories.MD5
 import com.example.testsecuritythierry.repositories.PackageManagerRepository
 import com.example.testsecuritythierry.repositories.VirusCheckerRepository
@@ -23,7 +24,10 @@ class ApplicationsInspectorViewModel(
     private val virusCheckerRepository: VirusCheckerRepository
 ) : ViewModel() {
 
+    // LiveData are observed in the UI
     var listPackages: MutableLiveData<MutableList<PackageInfo>> = MutableLiveData<MutableList<PackageInfo>>()
+    var mapAppToVirusStatus: Map<String, MutableLiveData<AnalysisResult>> = mapOf()
+
     var listPackagesAsStrings: List<String> = emptyList()
     var listCheckSums: List<String> = emptyList()
     var analyzedFilesMap: Map<String, Any> = emptyMap()
@@ -37,7 +41,7 @@ class ApplicationsInspectorViewModel(
             _uiState.value = UiState.Filled
             GlobalScope.launch {
                 listCheckSums = computePackagesHashes(it.toList())
-               // analyzedFilesMap = virusCheckerRepository.analyseFileHashes(listCheckSums)
+                analyzedFilesMap = virusCheckerRepository.analyseFileHashes(listCheckSums)
             }
         }
         virusCheckerRepository.init(

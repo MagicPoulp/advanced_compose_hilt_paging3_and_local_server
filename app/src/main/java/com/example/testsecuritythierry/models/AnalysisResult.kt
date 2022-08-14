@@ -1,6 +1,9 @@
-package com.example.testsecuritythierry.http
+package com.example.testsecuritythierry.models
 
 open class AnalysisResult {
+}
+
+class AnalysisResultPending: AnalysisResult() {
 }
 
 class AnalysisResultError: AnalysisResult() {

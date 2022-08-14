@@ -1,7 +1,6 @@
 package com.example.testsecuritythierry.ui
 
 import android.content.pm.PackageInfo
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
@@ -10,17 +9,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.testsecuritythierry.viewmodels.ApplicationsInspectorViewModel
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
-import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.testsecuritythierry.http.AnalysisResult
-import com.example.testsecuritythierry.http.AnalysisResultError
-import com.example.testsecuritythierry.http.AnalysisResultNoThreat
-import com.example.testsecuritythierry.http.AnalysisResultVirusFound
+import com.example.testsecuritythierry.models.AnalysisResultError
+import com.example.testsecuritythierry.models.AnalysisResultNoThreat
+import com.example.testsecuritythierry.models.AnalysisResultPending
+import com.example.testsecuritythierry.models.AnalysisResultVirusFound
 import java.lang.Math.floor
 
 val horizontalMargin = 20.dp
@@ -112,6 +109,7 @@ fun ApplicationStatusReporter(packageName: String, applicationsInspectorViewMode
                     is AnalysisResultVirusFound -> Text("Virus", color = Color.Red)
                     is AnalysisResultError -> Text("Error", color = Color.Blue)
                     is AnalysisResultNoThreat -> Text("No Threat", color = Color.Green)
+                    is AnalysisResultPending -> Text("Pending", color = Color.Black)
                 }
             }
     }

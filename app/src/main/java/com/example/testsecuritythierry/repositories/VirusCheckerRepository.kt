@@ -3,8 +3,12 @@ package com.example.testsecuritythierry.repositories
 import com.example.testsecuritythierry.config.maxConcurrentConnectionsOnVirusTotal
 import com.example.testsecuritythierry.config.virusTotalBaseUrl
 import com.example.testsecuritythierry.http.*
+import com.example.testsecuritythierry.models.AnalysisResultError
+import com.example.testsecuritythierry.models.AnalysisResultNoThreat
+import com.example.testsecuritythierry.models.AnalysisResultVirusFound
 import com.example.testsecuritythierry.models.DataVirusTotalFile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -43,44 +47,46 @@ class VirusCheckerRepository: KoinComponent {
     }
 
     // https://stackoverflow.com/questions/58658630/parallel-request-with-retrofit-coroutines-and-suspend-functions
-    suspend fun analyseFileHashes(hashes: List<String>): Map<String, Any> = hashes
+    @OptIn(FlowPreview::class)
+    fun analyseFileHashes(hashes: List<String>): Flow<Pair<String, Any>> = hashes
         .asFlow()
         .flowOn(Dispatchers.IO)
         .flatMapMerge(concurrency = maxConcurrentConnectionsOnVirusTotal) { hash ->
             flow {
-                var fileAnalysis: DataVirusTotalFile = DataVirusTotalFile(hash = hash)
                 val elapsed = measureTimeMillis {
                     //    withContext(Dispatchers.IO) {
-                    val response = api.analyseFileHash(hash)
-
-                    // code 404 means no virus
-                    if (!response.isSuccessful && response.code() == 404) {
-                        val result = AnalysisResultNoThreat()
-                        emit(hash to result)
-                    }
-                    // other error
-                    if (!response.isSuccessful && response.code() != 404) {
+                    try {
+                        val response = api.analyseFileHash(hash)
+                        // code 404 means no virus
+                        if (!response.isSuccessful && response.code() == 404) {
+                            val result = AnalysisResultNoThreat()
+                            emit(hash to result)
+                        }
+                        // other error
+                        if (!response.isSuccessful && response.code() != 404) {
+                            val result = AnalysisResultError()
+                            emit(hash to result)
+                        }
+                        // virus found
+                        if (response.isSuccessful) {
+                            val result = AnalysisResultVirusFound()
+                            emit(hash to result)
+                        }
+                    } catch(e: Throwable) {
                         val result = AnalysisResultError()
-                        emit(hash to result)
-                    }
-                    // virus found
-                    if (response.isSuccessful) {
-                        val result = AnalysisResultVirusFound()
                         emit(hash to result)
                     }
                 }
                 //println(elapsed)
                 // we make sure the flow task takes more than one minute
-                delay(maxOf(0L, 10 * 1000L - elapsed))
+                delay(maxOf(0L, 10 * 1000L - elapsed)) // TEMPORARY 10s
             }
         }
-        .toMap()
 
     suspend fun <K, V> Flow<Pair<K, V>>.toMap(): Map<K, V> {
         val result = mutableMapOf<K, V>()
         collect { (k, v) -> run {
             result[k] = v
-            println(v)
         }}
         return result
     }

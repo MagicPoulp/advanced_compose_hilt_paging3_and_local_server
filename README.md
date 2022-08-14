@@ -3,6 +3,22 @@
 Thierry Vilmart
 August 2022
 
+# Architecture
+
+Repositories -> ViewModel qui change les LiveData  -> UI avec observeAsState() sur les LiveData.
+Voir la doc :
+https://developer.android.com/jetpack/compose/architecture
+
+Les LiveData come State apportent une optimization car on ne change que la partie de l'UI associée quand la valeur change.
+De plus on a pas à calculer les changements sur un gros état plein de valeurs.
+De plus les observables peuvent être combinés pour faire tout comportement imaginable (debounce, etc).
+
+La file d'attente, pour respecter le quota de 4 requêtes par minute, est faite ainsi :
+Dans
+fun analyseFileHashes(hashes: List<String>): Flow<Pair<String, Any>> = hashes
+avec un
+.flatMapMerge(concurrency = maxConcurrentConnectionsOnVirusTotal)
+
 # Detailed information
 
 On Android 11, an additional field is required in the Manifest to get the list of installed applications.

@@ -14,7 +14,7 @@ class PackageManagerRepository: KoinComponent {
         return flow {
             val result: MutableList<PackageInfo> = packageManager.getInstalledPackages(0).toMutableList()
             result.sortBy { it.packageName }
-            emit(result)
+            emit(result.take(1).toMutableList()) // TEMPORARY
         }.flowOn(Dispatchers.IO)
     }
 }

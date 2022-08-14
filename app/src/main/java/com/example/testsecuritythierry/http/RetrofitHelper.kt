@@ -28,7 +28,7 @@ object RetrofitHelper {
         val builder = OkHttpClient().newBuilder()
         builder.dispatcher(dispatcher)
         builder.readTimeout(10, TimeUnit.SECONDS)
-        builder.connectTimeout(10, TimeUnit.SECONDS)
+        builder.connectTimeout(1, TimeUnit.SECONDS)
 
         if (BuildConfig.DEBUG) {
             val interceptor = HttpLoggingInterceptor()

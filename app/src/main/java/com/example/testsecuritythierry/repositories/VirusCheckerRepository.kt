@@ -2,10 +2,7 @@ package com.example.testsecuritythierry.repositories
 
 import com.example.testsecuritythierry.config.*
 import com.example.testsecuritythierry.http.*
-import com.example.testsecuritythierry.models.AnalysisResult
-import com.example.testsecuritythierry.models.AnalysisResultError
-import com.example.testsecuritythierry.models.AnalysisResultNoThreat
-import com.example.testsecuritythierry.models.AnalysisResultVirusFound
+import com.example.testsecuritythierry.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -66,7 +63,7 @@ class VirusCheckerRepository: KoinComponent {
                             return@flow
                         }
                         if (useAFakeUrlForVirusTotal && manuallyAddAVirus && hash == hashOfVirus1) {
-                            val result = AnalysisResultVirusFound()
+                            val result = AnalysisResultVirusFound(virusTotalFile = null)
                             emit(hash to result)
                             // we do not delay because we did not use the API
                             return@flow
@@ -87,7 +84,22 @@ class VirusCheckerRepository: KoinComponent {
                         }
                         // virus found
                         if (response.isSuccessful) {
-                            val result = AnalysisResultVirusFound()
+                            var parsedData: DataVirusTotalFile? = null
+                            response.body()?.let {
+                                parsedData = it
+                                if (it.data.attributes.last_analysis_stats.malicious > 0) {
+                                    val result = AnalysisResultVirusFound(virusTotalFile = parsedData)
+                                    emit(hash to result)
+                                    return@measureTimeMillis
+                                }
+                                // if no engine marked as malicious, then there is no threat
+                                // we ignore the suspicious property
+                                val result = AnalysisResultNoThreat()
+                                emit(hash to result)
+                                return@measureTimeMillis
+                            }
+                            // if we could not parse the file, we register an error
+                            val result = AnalysisResultError()
                             emit(hash to result)
                             return@measureTimeMillis
                         }

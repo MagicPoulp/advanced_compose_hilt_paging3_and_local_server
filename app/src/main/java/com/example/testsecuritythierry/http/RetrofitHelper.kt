@@ -8,8 +8,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 
 // https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/
@@ -48,7 +49,7 @@ object RetrofitHelper {
         return Retrofit.Builder()
             .client(client)
             .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(JacksonConverterFactory.create(jacksonObjectMapper()))
             .build()
     }
 }

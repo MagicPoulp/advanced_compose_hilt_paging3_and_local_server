@@ -3,14 +3,12 @@ package com.example.testsecuritythierry.models
 open class AnalysisResult {
 }
 
-class AnalysisResultPending: AnalysisResult() {
-}
+class AnalysisResultPending: AnalysisResult()
 
-class AnalysisResultError: AnalysisResult() {
-}
+class AnalysisResultError: AnalysisResult()
 
-class AnalysisResultNoThreat: AnalysisResult() {
-}
+class AnalysisResultNoThreat: AnalysisResult()
 
-class AnalysisResultVirusFound: AnalysisResult() {
-}
+class AnalysisResultVirusFound(
+    val virusTotalFile: DataVirusTotalFile?
+): AnalysisResult()

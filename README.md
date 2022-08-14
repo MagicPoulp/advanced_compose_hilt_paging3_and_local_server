@@ -12,6 +12,16 @@ like on the screenshot in the doc folder.
 
 # Architecture
 
+EN
+
+Repositories -> ViewModel which changes LiveData -> UI with observeAsState() on LiveData. See the doc: https://developer.android.com/jetpack/compose/architecture
+
+The LiveData like State bring an optimization because we only change the part of the associated UI when the value changes. Moreover, we don't have to calculate the changes on a large state full of values. Additionally observables can be combined to do any conceivable behavior (debounce, etc).
+
+The queue, to respect the quota of 4 requests per minute, is made as follows: In fun analyseFileHashes(hashes: List): Flow<Pair<String, Any>> = hashes with a .flatMapMerge(concurrency = maxConcurrentConnectionsOnVirusTotal)
+
+FR
+
 Repositories -> ViewModel qui change les LiveData  -> UI avec observeAsState() sur les LiveData.
 Voir la doc :
 https://developer.android.com/jetpack/compose/architecture
@@ -38,6 +48,9 @@ https://betterprogramming.pub/no-more-livedata-in-repositories-in-kotlin-85f5a23
 Retrofit with coroutines
 Note that Retrofit can limit the number of requests
 https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/
+
+We used Jackson to parse the JSON because it is very powerful with the
+@JsonProperty and the @JsonIgnoreProperties annotations.
 
 # Not done due to lack of time
 

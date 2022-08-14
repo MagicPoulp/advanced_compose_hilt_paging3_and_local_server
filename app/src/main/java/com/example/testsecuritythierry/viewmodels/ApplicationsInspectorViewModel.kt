@@ -1,23 +1,14 @@
 package com.example.testsecuritythierry.viewmodels
 
-import android.app.Activity
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.*
-import com.example.testsecuritythierry.R
-import com.example.testsecuritythierry.http.DataVirusTotalFile
 import com.example.testsecuritythierry.repositories.MD5
 import com.example.testsecuritythierry.repositories.PackageManagerRepository
 import com.example.testsecuritythierry.repositories.VirusCheckerRepository
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.io.File
-import java.net.URI
-import java.nio.file.Paths
 
 sealed class UiState {
     object Empty : UiState()
@@ -32,6 +23,7 @@ class ApplicationsInspectorViewModel(
 ) : ViewModel() {
 
     var listPackages: MutableLiveData<MutableList<PackageInfo>> = MutableLiveData<MutableList<PackageInfo>>()
+    var listPackagesAsStrings: List<String> = emptyList()
     var listCheckSums: List<String> = emptyList()
     var analyzedFilesMap: Map<String, Any> = emptyMap()
 
@@ -41,10 +33,10 @@ class ApplicationsInspectorViewModel(
 
     fun init(virusTotalRawApiKey: String, owner: LifecycleOwner, packageManager: PackageManager) {
         listPackages.observe(owner) {
-            //_uiState.value = UiState.Filled
-            listCheckSums = computePackagesHashes(it.toList()).take(80)
+            _uiState.value = UiState.Filled
+            //listCheckSums = computePackagesHashes(it.toList())
             viewModelScope.launch {
-                analyzedFilesMap = virusCheckerRepository.analyseFileHashes(listCheckSums)
+               // analyzedFilesMap = virusCheckerRepository.analyseFileHashes(listCheckSums)
             }
         }
         virusCheckerRepository.init(
@@ -53,21 +45,23 @@ class ApplicationsInspectorViewModel(
         getPackagesInLoop(packageManager)
     }
 
-    private fun getPackagesAsStrings(list: List<PackageInfo>) {
-        list.map{ "(" + it.packageName + "-" + it.versionName + ")"}.sorted()
+    private fun getPackagesAsStrings(list: List<PackageInfo>): List<String> {
+        return list.map{ "(" + it.packageName + "-" + it.versionName + ")"}.sorted()
     }
 
+    // every 30 seconds, we try to update the list of packages
     private fun getPackagesInLoop(packageManager: PackageManager){
         viewModelScope.launch {
             while (true) {
                 packageManagerRepository.getPackages(packageManager = packageManager).collect { list ->
-                    val listShort = getPackagesAsStrings(list)
-                    if (listShort != listPackages.value?.let { getPackagesAsStrings(it.toList()) }) {
-                        // we update only if a new package or a new version is detected
+                    val newListShort = getPackagesAsStrings(list)
+                    if (newListShort != listPackagesAsStrings) {
+                        _uiState.value = UiState.InProgress
+                        listPackagesAsStrings = newListShort
                         listPackages.postValue(list)
                     }
                 }
-                delay(60*1000L)
+                delay(30*1000L)
             }
         }
     }

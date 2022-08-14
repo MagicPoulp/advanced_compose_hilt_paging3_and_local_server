@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.http
+package com.example.testsecuritythierry.models
 
 data class DataVirusTotalFile(
     val hash: String,

@@ -1,19 +1,14 @@
 package com.example.testsecuritythierry.repositories
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import com.example.testsecuritythierry.config.maxConcurrentConnectionsOnVirusTotal
 import com.example.testsecuritythierry.config.virusTotalBaseUrl
 import com.example.testsecuritythierry.http.*
+import com.example.testsecuritythierry.models.DataVirusTotalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
-import java.util.concurrent.Semaphore
 import kotlin.system.measureTimeMillis
 
 /*

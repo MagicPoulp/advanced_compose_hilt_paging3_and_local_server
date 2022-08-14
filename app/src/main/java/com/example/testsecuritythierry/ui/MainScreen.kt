@@ -1,6 +1,5 @@
 package com.example.testsecuritythierry.ui
 
-import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,8 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.testsecuritythierry.MainActivity
@@ -37,7 +34,7 @@ fun MainScreen(packageManager: PackageManager,
         TopBarTitle()
         val state by applicationsInspectorViewModel.uiState.observeAsState()
         when (state) {
-            UiState.Filled -> Text(text = "Hello! size: ${applicationsInspectorViewModel.listPackages.value?.size}")
+            UiState.Filled -> TableWithAllApplications(applicationsInspectorViewModel)
             else -> Row {
                 ProgressIndicator()
             }

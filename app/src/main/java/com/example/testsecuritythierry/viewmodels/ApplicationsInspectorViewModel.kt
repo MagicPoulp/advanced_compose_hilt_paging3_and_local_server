@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.example.testsecuritythierry.repositories.MD5
 import com.example.testsecuritythierry.repositories.PackageManagerRepository
 import com.example.testsecuritythierry.repositories.VirusCheckerRepository
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -34,8 +35,8 @@ class ApplicationsInspectorViewModel(
     fun init(virusTotalRawApiKey: String, owner: LifecycleOwner, packageManager: PackageManager) {
         listPackages.observe(owner) {
             _uiState.value = UiState.Filled
-            //listCheckSums = computePackagesHashes(it.toList())
-            viewModelScope.launch {
+            GlobalScope.launch {
+                listCheckSums = computePackagesHashes(it.toList())
                // analyzedFilesMap = virusCheckerRepository.analyseFileHashes(listCheckSums)
             }
         }

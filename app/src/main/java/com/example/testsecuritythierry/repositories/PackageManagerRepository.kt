@@ -12,7 +12,9 @@ class PackageManagerRepository: KoinComponent {
 
     suspend fun getPackages(packageManager: PackageManager): Flow<MutableList<PackageInfo>> {
         return flow {
-            emit(packageManager.getInstalledPackages(0))
+            val result: MutableList<PackageInfo> = packageManager.getInstalledPackages(0).toMutableList()
+            result.sortBy { it.packageName }
+            emit(result)
         }.flowOn(Dispatchers.IO)
     }
 }

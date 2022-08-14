@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.ui
 
+import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.testsecuritythierry.MainActivity
+import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.viewmodels.ApplicationsInspectorViewModel
 import com.example.testsecuritythierry.viewmodels.UiState
 import org.koin.androidx.compose.getViewModel
@@ -25,13 +27,17 @@ fun MainScreen(packageManager: PackageManager,
         applicationsInspectorViewModel: ApplicationsInspectorViewModel = getViewModel(),
         activity: MainActivity
 ) {
-    applicationsInspectorViewModel.init(owner = activity, packageManager = packageManager)
+    applicationsInspectorViewModel.init(
+        virusTotalRawApiKey = activity.resources.getString( R.string.total_api_key),
+        owner = activity,
+        packageManager = packageManager
+    )
     Column(modifier = Modifier.fillMaxSize()
         .background(MaterialTheme.colors.secondary)) {
         TopBarTitle()
         val state by applicationsInspectorViewModel.uiState.observeAsState()
         when (state) {
-            UiState.Filled -> Text(text = "Hello! size: " + applicationsInspectorViewModel.listPackages.value?.size)
+            UiState.Filled -> Text(text = "Hello! size: ${applicationsInspectorViewModel.listPackages.value?.size}")
             else -> Row {
                 ProgressIndicator()
             }

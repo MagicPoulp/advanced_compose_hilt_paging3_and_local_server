@@ -12,3 +12,6 @@ https://stackoverflow.com/questions/60679685/what-does-query-all-packages-permis
 Blog for using Flow with LiveData
 https://betterprogramming.pub/no-more-livedata-in-repositories-in-kotlin-85f5a234a8fe
 
+Retrofit with coroutines
+Note that Retrofit can limit the number of requests
+https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/

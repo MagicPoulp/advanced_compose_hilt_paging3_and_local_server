@@ -42,7 +42,7 @@ class VirusCheckerRepository: KoinComponent {
 
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
-            baseUrl = virusTotalBaseUrl,
+            baseUrl = if (useAFakeUrlForVirusTotal) virusTotalBaseUrlFake else virusTotalBaseUrl,
             maxConnections = maxConcurrentConnectionsOnVirusTotal,
             requestHeader = Pair(first = "x-apikey", second = virusTotalApiKey)
         ).create(VirusTotalApi::class.java)
@@ -65,7 +65,7 @@ class VirusCheckerRepository: KoinComponent {
                             // we do not delay because we did not use the API
                             return@flow
                         }
-                        if (!manuallyAddAVirusWithRealUrl && manuallyAddAVirus && hash == hashOfVirus1) {
+                        if (useAFakeUrlForVirusTotal && manuallyAddAVirus && hash == hashOfVirus1) {
                             val result = AnalysisResultVirusFound()
                             emit(hash to result)
                             // we do not delay because we did not use the API

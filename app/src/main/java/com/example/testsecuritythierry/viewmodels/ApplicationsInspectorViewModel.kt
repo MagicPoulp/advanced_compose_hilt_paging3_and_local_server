@@ -31,23 +31,34 @@ class ApplicationsInspectorViewModel(
 ) : ViewModel() {
 
     // LiveData are observed in the UI
+    // the underscore is used to limit the access from outside this file
+
+    // the list of packages installed on the device
     var listPackages: MutableLiveData<MutableList<PackageInfo>> = MutableLiveData<MutableList<PackageInfo>>()
+    // for each App we mark the status (Pending, Error, Virus Found, No threat, etc)
     var mapAppToVirusStatus: MutableMap<String, MutableLiveData<AnalysisResult>> = mutableMapOf()
+    // the history of all times (it could be put in persistent memory)
     private var mapHashToVirusStatusHistory: MutableMap<String, AnalysisResult> = mutableMapOf()
+    // we count the unfinished analyses of packages
     private var _numUnfinished: MutableLiveData<Int> = MutableLiveData(-1)
     val numUnfinished: LiveData<Int>
         get() = _numUnfinished
+    // The UI state for showing the first page with a spinner or not
     private val _uiState = MutableLiveData<UiState>(UiState.Empty)
     val uiState: LiveData<UiState>
         get() = _uiState
+    // we count the number of viruses found
     private var _numViruses: MutableLiveData<Int> = MutableLiveData(0)
     val numViruses: LiveData<Int>
         get() = _numViruses
 
+    // ------------------------------------------
+    // non LiveData variables
     var listPackagesAsStrings: List<String> = emptyList()
     private var mapAppToHash: MutableMap<String, String> = mutableMapOf()
     var mapHashToApp: MutableMap<String, String> = mutableMapOf()
     var initialized = false
+    // to be used to cancel the flow job
     private var analysisJob: Job? = null
 
     // an init function is required to pass the string resource and the Activity lifecycle owner

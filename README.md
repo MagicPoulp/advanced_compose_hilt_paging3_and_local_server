@@ -6,6 +6,9 @@ August 2022
 # Test setup
 
 In Constants.kt, there are different booleans to use a fake Virus hash, to see all scenarios.
+The production set is active using a real VirusTotalUrl and all packages.
+You can try to use the trial example to see what happens when all packages are analysed, with the UI that updates
+like on the screenshot in the doc folder.
 
 # Architecture
 
@@ -45,3 +48,6 @@ We need many unit tests where the logic is complex.
 We only hash the MD5, but perhaps we should also test the SHA1 and the SHA256,
 since VirusTotal supports the 3 hashes types
 https://support.virustotal.com/hc/en-us/articles/115002739245-Searching
+
+mapHashToVirusStatusHistory could be put in persistent memory to speed up the analysis with known hashes.
+

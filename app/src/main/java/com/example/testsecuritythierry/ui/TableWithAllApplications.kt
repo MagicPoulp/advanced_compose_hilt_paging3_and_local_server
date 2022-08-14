@@ -108,7 +108,7 @@ fun ApplicationStatusReporter(packageName: String, applicationsInspectorViewMode
                 when (state) {
                     is AnalysisResultVirusFound -> Text("Virus", color = Color.Red)
                     is AnalysisResultError -> Text("Error", color = Color.Blue)
-                    is AnalysisResultNoThreat -> Text("No Threat", color = Color.Green)
+                    is AnalysisResultNoThreat -> Text("No threat", color = Color(0xFF1E821E))
                     is AnalysisResultPending -> Text("Pending", color = Color.Black)
                 }
             }

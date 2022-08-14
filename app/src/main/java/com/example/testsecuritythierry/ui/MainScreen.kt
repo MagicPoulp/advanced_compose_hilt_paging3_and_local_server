@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.testsecuritythierry.MainActivity
@@ -24,39 +26,60 @@ fun MainScreen(packageManager: PackageManager,
         applicationsInspectorViewModel: ApplicationsInspectorViewModel = getViewModel(),
         activity: MainActivity
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val topAndBottomBarHeight = 80.dp
     applicationsInspectorViewModel.init(
         virusTotalRawApiKey = activity.resources.getString( R.string.total_api_key),
         owner = activity,
         packageManager = packageManager
     )
-    Column(modifier = Modifier.fillMaxSize()
-        .background(MaterialTheme.colors.secondary)) {
-        TopBarTitle()
-        val state by applicationsInspectorViewModel.uiState.observeAsState()
-        when (state) {
-            UiState.Filled -> TableWithAllApplications(applicationsInspectorViewModel)
-            else -> Row {
-                ProgressIndicator()
+    Box(contentAlignment = Alignment.TopCenter,
+        modifier = Modifier
+        .fillMaxSize() ) {
+        //.background(MaterialTheme.colors.secondary)) {
+        Row(modifier = Modifier
+            .height(topAndBottomBarHeight)
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.secondary)
+            .align(alignment = Alignment.TopCenter)
+        ) {
+            TopBarTitle()
+        }
+        Row(modifier = Modifier
+            .height(screenHeight - topAndBottomBarHeight * 2)
+            .background(MaterialTheme.colors.primaryVariant)
+            .fillMaxWidth()
+            .align(alignment = Alignment.Center)
+        ) {
+            val state by applicationsInspectorViewModel.uiState.observeAsState()
+            when (state) {
+                UiState.Filled -> TableWithAllApplications(applicationsInspectorViewModel)
+                else -> Row {
+                    ProgressIndicator()
+                }
             }
+        }
+        Row(modifier = Modifier
+            .align(alignment = Alignment.BottomCenter)
+            .height(topAndBottomBarHeight)
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colors.secondary)) {
         }
     }
 }
 
 @Composable
 fun TopBarTitle() {
-    Row(modifier = Modifier.padding(start = 60.dp, end = 60.dp).height(80.dp)
-        .background(MaterialTheme.colors.secondary),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically) {
-        Column(verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()) {
-            Text(text = "ApplicationsInspector is analyzing your apps...",
-                style = MaterialTheme.typography.h1,
-                textAlign = TextAlign.Center
-            )
-        }
+    Column(verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(start = 60.dp, end = 60.dp)
+            .fillMaxSize()) {
+        Text(text = "ApplicationsInspector is analyzing your apps...",
+            style = MaterialTheme.typography.h1,
+            textAlign = TextAlign.Center
+        )
     }
 }
 

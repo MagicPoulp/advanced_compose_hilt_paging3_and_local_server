@@ -86,8 +86,10 @@ class ApplicationsInspectorViewModel(
                         listPackagesAsStrings = newListShort
                         listPackages.postValue(list)
                     } else {
+                        // we wait for all pending statuses to be finished
+                        val pending = mapAppToVirusStatus.values.map { it.value }.filterIsInstance<AnalysisResultPending>()
                         val errors = mapAppToVirusStatus.values.map { it.value }.filterIsInstance<AnalysisResultError>()
-                        if (errors.isNotEmpty()) {
+                        if (errors.isNotEmpty() && pending.isEmpty()) {
                             listPackages.postValue(list)
                         }
                     }
@@ -118,6 +120,7 @@ class ApplicationsInspectorViewModel(
             // we cancel the job but not the collect (or we would use flowAnalyze.cancellable())
             // we interrupt to start a new analysis, and it can affect the quota if requests are already sent.
             // it can result in errors. But it does not matter because we refresh errors
+            // since we waited for all Pending statuses to have disappeared, it should not interrupt anything
             analysisJob?.cancel()
         }
         // we must use the global scope so that we do not block the UI

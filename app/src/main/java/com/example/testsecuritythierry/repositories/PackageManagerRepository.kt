@@ -19,7 +19,7 @@ class PackageManagerRepository: KoinComponent {
             if (manuallyAddAVirus) {
                 result.first().packageName = virus1
             }
-            emit(result.take(1).toMutableList()) // TEMPORARY
+            emit(result.take(5).toMutableList()) // TEMPORARY
         }.flowOn(Dispatchers.IO)
     }
 }

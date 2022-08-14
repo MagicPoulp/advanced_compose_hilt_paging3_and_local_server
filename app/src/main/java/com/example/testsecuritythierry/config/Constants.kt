@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.config
 
+const val analysisRefreshInterval = 30*1000L
 const val maxConcurrentConnectionsOnVirusTotal = 4
 // it must end with a slash
 //const val virusTotalBaseUrl = "https://www.virustotal.com/api/v3/"

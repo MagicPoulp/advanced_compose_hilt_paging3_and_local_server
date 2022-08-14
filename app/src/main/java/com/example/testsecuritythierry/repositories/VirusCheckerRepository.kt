@@ -5,6 +5,7 @@ import com.example.testsecuritythierry.config.manuallyAddAVirus
 import com.example.testsecuritythierry.config.maxConcurrentConnectionsOnVirusTotal
 import com.example.testsecuritythierry.config.virusTotalBaseUrl
 import com.example.testsecuritythierry.http.*
+import com.example.testsecuritythierry.models.AnalysisResult
 import com.example.testsecuritythierry.models.AnalysisResultError
 import com.example.testsecuritythierry.models.AnalysisResultNoThreat
 import com.example.testsecuritythierry.models.AnalysisResultVirusFound
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.system.measureTimeMillis
+
+const val oneMinute = 60 * 1000L
 
 /*
 * Quotas in the Free VirusTotal account:
@@ -27,7 +30,8 @@ class VirusCheckerRepository: KoinComponent {
     // to be used wit ha x-apikey header
     private val virusTotalApiKey: String
         get() {
-            val rawKey = "$virusTotalRawApiKey=="
+            // hashing makes it a little harder to steal the ApiKey from the archive
+            val rawKey = "NTZjMDE$virusTotalRawApiKey=="
             val decoder: Base64.Decoder = Base64.getDecoder()
             return String(decoder.decode(rawKey))
         }
@@ -47,36 +51,48 @@ class VirusCheckerRepository: KoinComponent {
         ).create(VirusTotalApi::class.java)
     }
 
+    // We only take 4 flow tasks per minute using flatMapMerge()
     // https://stackoverflow.com/questions/58658630/parallel-request-with-retrofit-coroutines-and-suspend-functions
     @OptIn(FlowPreview::class)
-    fun analyseFileHashes(hashes: List<String>): Flow<Pair<String, Any>> = hashes
+    fun analyseFileHashes(
+        hashes: List<String>,
+        mapHashToVirusStatusHistory: MutableMap<String, AnalysisResult>): Flow<Pair<String, Any>> = hashes
         .asFlow()
         .flowOn(Dispatchers.IO)
         .flatMapMerge(concurrency = maxConcurrentConnectionsOnVirusTotal) { hash ->
             flow {
                 val elapsed = measureTimeMillis {
-                    //    withContext(Dispatchers.IO) {
                     try {
+                        mapHashToVirusStatusHistory[hash]?.let { rememberedValue ->
+                            emit(hash to rememberedValue)
+                            // we do not delay because we did not use the API
+                            return@flow
+                        }
                         if (manuallyAddAVirus && hash == hashOfVirus1) {
                             val result = AnalysisResultVirusFound()
                             emit(hash to result)
-                        } else {
-                            val response = api.analyseFileHash(hash)
-                            // code 404 means no virus
-                            if (!response.isSuccessful && response.code() == 404) {
-                                val result = AnalysisResultNoThreat()
-                                emit(hash to result)
-                            }
-                            // other error
-                            if (!response.isSuccessful && response.code() != 404) {
-                                val result = AnalysisResultError()
-                                emit(hash to result)
-                            }
-                            // virus found
-                            if (response.isSuccessful) {
-                                val result = AnalysisResultVirusFound()
-                                emit(hash to result)
-                            }
+                            // we do not delay because we did not use the API
+                            return@flow
+                        }
+                        // ------> API access to analyze the file for viruses
+                        val response = api.analyseFileHash(hash)
+                        // code 404 means no virus
+                        if (!response.isSuccessful && response.code() == 404) {
+                            val result = AnalysisResultNoThreat()
+                            emit(hash to result)
+                            return@measureTimeMillis
+                        }
+                        // other error
+                        if (!response.isSuccessful && response.code() != 404) {
+                            val result = AnalysisResultError()
+                            emit(hash to result)
+                            return@measureTimeMillis
+                        }
+                        // virus found
+                        if (response.isSuccessful) {
+                            val result = AnalysisResultVirusFound()
+                            emit(hash to result)
+                            return@measureTimeMillis
                         }
                     } catch(e: Throwable) {
                         val result = AnalysisResultError()
@@ -85,15 +101,7 @@ class VirusCheckerRepository: KoinComponent {
                 }
                 //println(elapsed)
                 // we make sure the flow task takes more than one minute
-                delay(maxOf(0L, 10 * 1000L - elapsed)) // TEMPORARY 10s
+                delay(maxOf(0L, oneMinute - elapsed))
             }
         }
-
-    suspend fun <K, V> Flow<Pair<K, V>>.toMap(): Map<K, V> {
-        val result = mutableMapOf<K, V>()
-        collect { (k, v) -> run {
-            result[k] = v
-        }}
-        return result
-    }
 }

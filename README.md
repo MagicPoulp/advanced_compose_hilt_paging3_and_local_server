@@ -34,6 +34,10 @@ https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/
 
 # Not done due to lack of time
 
+The UI could look much better with better colors, fonts, and a proper design. But it takes time.
+
+We need many unit tests where the logic is complex.
+
 We only hash the MD5, but perhaps we should also test the SHA1 and the SHA256,
 since VirusTotal supports the 3 hashes types
 https://support.virustotal.com/hc/en-us/articles/115002739245-Searching

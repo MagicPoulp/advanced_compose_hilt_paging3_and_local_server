@@ -3,6 +3,10 @@
 Thierry Vilmart
 August 2022
 
+# Test setup
+
+In Constants.kt, there are different booleans to use a fake Virus hash, to see all scenarios.
+
 # Architecture
 
 Repositories -> ViewModel qui change les LiveData  -> UI avec observeAsState() sur les LiveData.

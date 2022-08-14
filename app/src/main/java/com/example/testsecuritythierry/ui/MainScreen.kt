@@ -7,6 +7,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ fun MainScreen(packageManager: PackageManager,
         applicationsInspectorViewModel: ApplicationsInspectorViewModel = getViewModel(),
         activity: MainActivity
 ) {
+    val numUnfinished by applicationsInspectorViewModel.numUnfinished.observeAsState()
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val topAndBottomBarHeight = 80.dp
@@ -44,7 +46,7 @@ fun MainScreen(packageManager: PackageManager,
             .background(MaterialTheme.colors.secondary)
             .align(alignment = Alignment.TopCenter)
         ) {
-            TopBarTitle()
+            TopBarTitle(numUnfinished)
         }
         Row(modifier = Modifier
             .height(screenHeight - topAndBottomBarHeight * 2)
@@ -65,18 +67,20 @@ fun MainScreen(packageManager: PackageManager,
             .height(topAndBottomBarHeight)
             .fillMaxWidth()
             .background(color = MaterialTheme.colors.secondary)) {
+            BottomInformationBar(applicationsInspectorViewModel)
         }
     }
 }
 
 @Composable
-fun TopBarTitle() {
+fun TopBarTitle(numUnfinished: Int?) {
     Column(verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(start = 60.dp, end = 60.dp)
             .fillMaxSize()) {
-        Text(text = "ApplicationsInspector is analyzing your apps...",
+        val text = if (numUnfinished == 0) "ApplicationsInspector is done." else "ApplicationsInspector is analyzing your apps..."
+        Text(text = text,
             style = MaterialTheme.typography.h1,
             textAlign = TextAlign.Center
         )

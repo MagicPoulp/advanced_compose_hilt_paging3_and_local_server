@@ -2,6 +2,7 @@ package com.example.testsecuritythierry.repositories
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import com.example.testsecuritythierry.config.fivePackagesOnly
 import com.example.testsecuritythierry.config.manuallyAddAVirus
 import com.example.testsecuritythierry.config.virus1
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,11 @@ class PackageManagerRepository: KoinComponent {
             if (manuallyAddAVirus) {
                 result.first().packageName = virus1
             }
-            emit(result.take(5).toMutableList()) // TEMPORARY
+            if (fivePackagesOnly) {
+                emit(result.take(5).toMutableList())
+            } else {
+                emit(result)
+            }
         }.flowOn(Dispatchers.IO)
     }
 }

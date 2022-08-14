@@ -1,9 +1,6 @@
 package com.example.testsecuritythierry.repositories
 
-import com.example.testsecuritythierry.config.hashOfVirus1
-import com.example.testsecuritythierry.config.manuallyAddAVirus
-import com.example.testsecuritythierry.config.maxConcurrentConnectionsOnVirusTotal
-import com.example.testsecuritythierry.config.virusTotalBaseUrl
+import com.example.testsecuritythierry.config.*
 import com.example.testsecuritythierry.http.*
 import com.example.testsecuritythierry.models.AnalysisResult
 import com.example.testsecuritythierry.models.AnalysisResultError
@@ -68,7 +65,7 @@ class VirusCheckerRepository: KoinComponent {
                             // we do not delay because we did not use the API
                             return@flow
                         }
-                        if (manuallyAddAVirus && hash == hashOfVirus1) {
+                        if (!manuallyAddAVirusWithRealUrl && manuallyAddAVirus && hash == hashOfVirus1) {
                             val result = AnalysisResultVirusFound()
                             emit(hash to result)
                             // we do not delay because we did not use the API

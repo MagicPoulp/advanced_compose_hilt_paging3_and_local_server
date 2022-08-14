@@ -9,6 +9,7 @@ import retrofit2.http.Path
 
 interface VirusTotalApi {
     // https://developers.virustotal.com/reference/file-info
-    @GET("/files/{id}")
+    // due to a bug we cannot move /api/v3 to the baseUrl
+    @GET("/api/v3/files/{id}")
     suspend fun analyseFileHash(@Path("id") idStr: String): Response<DataVirusTotalFile>
 }

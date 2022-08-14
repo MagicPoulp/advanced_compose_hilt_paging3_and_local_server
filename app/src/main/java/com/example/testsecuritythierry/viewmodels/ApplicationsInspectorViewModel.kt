@@ -10,14 +10,13 @@ import com.example.testsecuritythierry.config.virus1
 import com.example.testsecuritythierry.models.AnalysisResult
 import com.example.testsecuritythierry.models.AnalysisResultError
 import com.example.testsecuritythierry.models.AnalysisResultPending
+import com.example.testsecuritythierry.models.AnalysisResultVirusFound
 import com.example.testsecuritythierry.repositories.MD5
 import com.example.testsecuritythierry.repositories.PackageManagerRepository
 import com.example.testsecuritythierry.repositories.VirusCheckerRepository
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
+import java.util.concurrent.locks.ReentrantLock
 
 sealed class UiState {
     object Empty : UiState()
@@ -35,16 +34,21 @@ class ApplicationsInspectorViewModel(
     var listPackages: MutableLiveData<MutableList<PackageInfo>> = MutableLiveData<MutableList<PackageInfo>>()
     var mapAppToVirusStatus: MutableMap<String, MutableLiveData<AnalysisResult>> = mutableMapOf()
     private var mapHashToVirusStatusHistory: MutableMap<String, AnalysisResult> = mutableMapOf()
+    private var _numUnfinished: MutableLiveData<Int> = MutableLiveData(-1)
+    val numUnfinished: LiveData<Int>
+        get() = _numUnfinished
+    private val _uiState = MutableLiveData<UiState>(UiState.Empty)
+    val uiState: LiveData<UiState>
+        get() = _uiState
+    private var _numViruses: MutableLiveData<Int> = MutableLiveData(0)
+    val numViruses: LiveData<Int>
+        get() = _numViruses
 
     var listPackagesAsStrings: List<String> = emptyList()
     private var mapAppToHash: MutableMap<String, String> = mutableMapOf()
     var mapHashToApp: MutableMap<String, String> = mutableMapOf()
     var initialized = false
-    var analysisJob: Job? = null
-
-    private val _uiState = MutableLiveData<UiState>(UiState.Empty)
-    val uiState: LiveData<UiState>
-        get() = _uiState
+    private var analysisJob: Job? = null
 
     // an init function is required to pass the string resource and the Activity lifecycle owner
     fun init(virusTotalRawApiKey: String, owner: LifecycleOwner, packageManager: PackageManager) {
@@ -59,8 +63,17 @@ class ApplicationsInspectorViewModel(
             // set all statuses as pending
             mapAppToVirusStatus = mutableMapOf()
             allPackages.toList().forEach { packageInfo ->
-                mapAppToVirusStatus[packageInfo.packageName] = MutableLiveData(AnalysisResultPending())
+                mapAppToVirusStatus[packageInfo.packageName]?.let {
+                    it.postValue(AnalysisResultPending())
+                } ?: run {
+                    // we create the observables only if they do not exist
+                    mapAppToVirusStatus[packageInfo.packageName] =
+                        MutableLiveData(AnalysisResultPending())
+                }
             }
+            // reset counters
+            _numUnfinished.value = allPackages.size
+            _numViruses.value = 0
             // this triggers a display of the first list of packages
             _uiState.value = UiState.Filled
             analyzeAllPackages(allPackages)
@@ -72,7 +85,7 @@ class ApplicationsInspectorViewModel(
     }
 
     private fun getPackagesAsStrings(list: List<PackageInfo>): List<String> {
-        return list.map{ "(" + it.packageName + "-" + it.versionName + ")"}.sorted()
+        return list.map { "(" + it.packageName + "-" + it.versionName + ")"}.sorted()
     }
 
     // every 30 seconds, we try to update the list of packages
@@ -148,6 +161,20 @@ class ApplicationsInspectorViewModel(
                     }
                     if (v !is AnalysisResultError) {
                         mapHashToVirusStatusHistory[hash] = v as AnalysisResult
+                    }
+                    if (v !is AnalysisResultError && v !is AnalysisResultPending) {
+                        // we need the main thread because LiveData is handled on the Main thread anyways
+                        // and synchronization is needed to decrement the value
+                        launch(Dispatchers.Main) {
+                            _numUnfinished.value = _numUnfinished.value?.minus(1)
+                        }
+                    }
+                    if (v is AnalysisResultVirusFound) {
+                        // we need the main thread because LiveData is handled on the Main thread anyways
+                        // and synchronization is needed to decrement the value
+                        launch(Dispatchers.Main) {
+                            _numViruses.value = _numViruses.value?.plus(1)
+                        }
                     }
                 }
             }}

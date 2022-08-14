@@ -1,12 +1,13 @@
 package com.example.testsecuritythierry.repositories
 
+import com.example.testsecuritythierry.config.hashOfVirus1
+import com.example.testsecuritythierry.config.manuallyAddAVirus
 import com.example.testsecuritythierry.config.maxConcurrentConnectionsOnVirusTotal
 import com.example.testsecuritythierry.config.virusTotalBaseUrl
 import com.example.testsecuritythierry.http.*
 import com.example.testsecuritythierry.models.AnalysisResultError
 import com.example.testsecuritythierry.models.AnalysisResultNoThreat
 import com.example.testsecuritythierry.models.AnalysisResultVirusFound
-import com.example.testsecuritythierry.models.DataVirusTotalFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -56,21 +57,26 @@ class VirusCheckerRepository: KoinComponent {
                 val elapsed = measureTimeMillis {
                     //    withContext(Dispatchers.IO) {
                     try {
-                        val response = api.analyseFileHash(hash)
-                        // code 404 means no virus
-                        if (!response.isSuccessful && response.code() == 404) {
-                            val result = AnalysisResultNoThreat()
-                            emit(hash to result)
-                        }
-                        // other error
-                        if (!response.isSuccessful && response.code() != 404) {
-                            val result = AnalysisResultError()
-                            emit(hash to result)
-                        }
-                        // virus found
-                        if (response.isSuccessful) {
+                        if (manuallyAddAVirus && hash == hashOfVirus1) {
                             val result = AnalysisResultVirusFound()
                             emit(hash to result)
+                        } else {
+                            val response = api.analyseFileHash(hash)
+                            // code 404 means no virus
+                            if (!response.isSuccessful && response.code() == 404) {
+                                val result = AnalysisResultNoThreat()
+                                emit(hash to result)
+                            }
+                            // other error
+                            if (!response.isSuccessful && response.code() != 404) {
+                                val result = AnalysisResultError()
+                                emit(hash to result)
+                            }
+                            // virus found
+                            if (response.isSuccessful) {
+                                val result = AnalysisResultVirusFound()
+                                emit(hash to result)
+                            }
                         }
                     } catch(e: Throwable) {
                         val result = AnalysisResultError()

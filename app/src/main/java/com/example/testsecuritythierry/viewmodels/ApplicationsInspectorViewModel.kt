@@ -3,6 +3,9 @@ package com.example.testsecuritythierry.viewmodels
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.*
+import com.example.testsecuritythierry.config.hashOfVirus1
+import com.example.testsecuritythierry.config.manuallyAddAVirus
+import com.example.testsecuritythierry.config.virus1
 import com.example.testsecuritythierry.models.AnalysisResult
 import com.example.testsecuritythierry.models.AnalysisResultPending
 import com.example.testsecuritythierry.repositories.MD5
@@ -95,10 +98,14 @@ class ApplicationsInspectorViewModel(
     private fun computePackagesHashes(list: List<PackageInfo>): MutableMap<String, String> {
         val result: MutableMap<String, String> = mutableMapOf()
         list.map {
-            val urlPath = it.applicationInfo.sourceDir
-            val file = File(urlPath)
-            val md5 = MD5.calculateMD5(file)
-            result[it.packageName] = md5
+            if (manuallyAddAVirus && it.packageName == virus1) {
+                result[it.packageName] = hashOfVirus1
+            } else {
+                val urlPath = it.applicationInfo.sourceDir
+                val file = File(urlPath)
+                val md5 = MD5.calculateMD5(file)
+                result[it.packageName] = md5
+            }
         }
         return result
     }

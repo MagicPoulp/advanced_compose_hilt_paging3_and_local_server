@@ -1,7 +1,12 @@
 # Author
 
 Thierry Vilmart
+
 August 2022
+
+ARP Poisoning: voir dans le dossier doc, le fichier question_ARP_poisoning.md avec la réponse concernant l'attaque ARP poisoning.
+
+Le code moderne avec Compose et des coroutines a la particularité d'être optimisé, ce qui réduit la consommation de batterie et de resources CPU. La performance constitue une qualité importante sur les logiciels antivirus.
 
 # Test setup
 
@@ -14,7 +19,9 @@ like on the screenshot in the doc folder.
 
 EN
 
-Repositories -> ViewModel which changes LiveData -> UI with observeAsState() on LiveData. See the doc: https://developer.android.com/jetpack/compose/architecture
+Repositories -> ViewModel which changes LiveData -> UI with observeAsState() on LiveData.
+See the doc:
+https://developer.android.com/jetpack/compose/architecture
 
 The LiveData like State bring an optimization because we only change the part of the associated UI when the value changes. Moreover, we don't have to calculate the changes on a large state full of values. Additionally observables can be combined to do any conceivable behavior (debounce, etc).
 

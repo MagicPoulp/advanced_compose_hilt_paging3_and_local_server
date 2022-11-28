@@ -37,7 +37,7 @@ class NewsDataRepository: KoinComponent {
         }
         val response = api.getNews()
         if (response.isSuccessful) {
-            response.body()?.let { emit(it.elements) }
+            response.body()?.let { emit(it.elements.filter { it2 -> it2.titre != null }) }
             return@flow
         }
     /*

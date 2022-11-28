@@ -62,6 +62,8 @@ class NewsViewModel(
             // this triggers a display of the first list of packages
             _uiState.value = UiState.Filled
             */
+
+            _uiState.value = UiState.Filled
         }
         getNewsInLoop()
     }

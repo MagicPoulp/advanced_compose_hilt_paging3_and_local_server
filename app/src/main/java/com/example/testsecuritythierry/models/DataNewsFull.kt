@@ -18,8 +18,7 @@ data class DataNewsElement(
     @JsonProperty("titre")
     val titre: String?,
     //@JsonProperty("id")
-    //val id: String,
-    // optional html
-//    @JsonProperty("html")
-//    val html: String,
+    val id: Int?,
+    @JsonProperty("html")
+    val html: String?,
 )

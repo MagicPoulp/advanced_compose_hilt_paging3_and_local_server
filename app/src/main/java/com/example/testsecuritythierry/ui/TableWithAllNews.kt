@@ -7,17 +7,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import com.example.testsecuritythierry.viewmodels.ApplicationsInspectorViewModel
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.testsecuritythierry.models.AnalysisResultError
-import com.example.testsecuritythierry.models.AnalysisResultNoThreat
-import com.example.testsecuritythierry.models.AnalysisResultPending
-import com.example.testsecuritythierry.models.AnalysisResultVirusFound
+
+import com.example.testsecuritythierry.viewmodels.NewsViewModel
 import java.lang.Math.floor
 
 val horizontalMargin = 20.dp
@@ -26,24 +22,26 @@ const val goldenNumber = 1.618
 val statusAreaWidth = (floor(goldenNumber * 60)).dp
 
 @Composable
-fun TableWithAllApplications(
-    applicationsInspectorViewModel: ApplicationsInspectorViewModel,
+fun TableWithAllNews(
+    newsViewModel: NewsViewModel,
 ) {
-    val state by applicationsInspectorViewModel.listPackages.observeAsState()
+    val state by newsViewModel.listNews.observeAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = horizontalMargin),
     ) {
+        /*
         state?.let {
             items(it.toList()) { item ->
                 TableItemRow(item, applicationsInspectorViewModel)
             }
         }
+        */
     }
 }
 
 @Composable
-fun TableItemRow(item: PackageInfo, applicationsInspectorViewModel: ApplicationsInspectorViewModel) {
+fun TableItemRow(item: PackageInfo, newsViewModel: NewsViewModel) {
     val numLetters = 25
     Box(
         modifier = Modifier
@@ -81,7 +79,7 @@ fun TableItemRow(item: PackageInfo, applicationsInspectorViewModel: Applications
                         .fillMaxHeight()
                         .width(statusAreaWidth)
                 ) {
-                    ApplicationStatusReporter(item.packageName, applicationsInspectorViewModel)
+                    //ApplicationStatusReporter(item.packageName, newsViewModel)
                 }
             }
         }
@@ -92,25 +90,5 @@ fun TableItemRow(item: PackageInfo, applicationsInspectorViewModel: Applications
                 .fillMaxWidth()
                 .height(1.dp)
         )
-    }
-}
-
-@Composable
-fun ApplicationStatusReporter(packageName: String, applicationsInspectorViewModel: ApplicationsInspectorViewModel) {
-    val itemLiveData = applicationsInspectorViewModel.mapAppToVirusStatus[packageName]
-    Column(verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()) {
-            if (itemLiveData == null) {
-                Text("Pending", color = Color.Black)
-            } else {
-                val state by itemLiveData.observeAsState()
-                when (state) {
-                    is AnalysisResultVirusFound -> Text("Virus", color = Color.Red)
-                    is AnalysisResultError -> Text("Error", color = Color.Blue)
-                    is AnalysisResultNoThreat -> Text("No threat", color = Color(0xFF1E821E))
-                    is AnalysisResultPending -> Text("Pending", color = Color.Black)
-                }
-            }
     }
 }

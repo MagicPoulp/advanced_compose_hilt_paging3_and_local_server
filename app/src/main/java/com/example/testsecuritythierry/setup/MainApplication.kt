@@ -13,7 +13,7 @@ class MainApplication : Application() {
             //inject Android context
             androidContext(this@MainApplication)
             // use modules
-            modules(testSecurityThierryInjectionModule)
+            modules(newsInjectionModule)
         }
 
     }

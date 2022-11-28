@@ -10,8 +10,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.testsecuritythierry.viewmodels.ApplicationsInspectorViewModel
 
+/*
 @Composable
 fun BottomInformationBar(applicationsInspectorViewModel: ApplicationsInspectorViewModel) {
     val numInfected by applicationsInspectorViewModel.numViruses.observeAsState()
@@ -56,3 +56,4 @@ fun BottomInformationBar(applicationsInspectorViewModel: ApplicationsInspectorVi
         }
     }
 }
+*/

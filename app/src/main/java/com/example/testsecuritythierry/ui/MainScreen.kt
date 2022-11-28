@@ -18,28 +18,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.testsecuritythierry.MainActivity
 import com.example.testsecuritythierry.R
-import com.example.testsecuritythierry.viewmodels.ApplicationsInspectorViewModel
+import com.example.testsecuritythierry.viewmodels.NewsViewModel
 import com.example.testsecuritythierry.viewmodels.UiState
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun MainScreen(packageManager: PackageManager,
-        applicationsInspectorViewModel: ApplicationsInspectorViewModel = getViewModel(),
-        activity: MainActivity
+               newsViewModel: NewsViewModel = getViewModel(),
+               activity: MainActivity
 ) {
-    val numUnfinished by applicationsInspectorViewModel.numUnfinished.observeAsState()
+    //val numUnfinished by newsViewModel.numUnfinished.observeAsState()
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val topAndBottomBarHeight = 80.dp
-    applicationsInspectorViewModel.init(
-        virusTotalRawApiKey = activity.resources.getString( R.string.total_api_key),
+    newsViewModel.init(
         owner = activity,
-        packageManager = packageManager
     )
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
         .fillMaxSize() ) {
         //.background(MaterialTheme.colors.secondary)) {
+        /*
+        // if we want a top bar
         Row(modifier = Modifier
             .height(topAndBottomBarHeight)
             .fillMaxWidth()
@@ -48,27 +48,31 @@ fun MainScreen(packageManager: PackageManager,
         ) {
             TopBarTitle(numUnfinished)
         }
+         */
         Row(modifier = Modifier
             .height(screenHeight - topAndBottomBarHeight * 2)
             .background(MaterialTheme.colors.primaryVariant)
             .fillMaxWidth()
             .align(alignment = Alignment.Center)
         ) {
-            val state by applicationsInspectorViewModel.uiState.observeAsState()
+            val state by newsViewModel.uiState.observeAsState()
             when (state) {
-                UiState.Filled -> TableWithAllApplications(applicationsInspectorViewModel)
+                UiState.Filled -> TableWithAllNews(newsViewModel)
                 else -> Row {
                     ProgressIndicator()
                 }
             }
         }
+        /*
+        // a bottom bar
         Row(modifier = Modifier
             .align(alignment = Alignment.BottomCenter)
             .height(topAndBottomBarHeight)
             .fillMaxWidth()
             .background(color = MaterialTheme.colors.secondary)) {
-            BottomInformationBar(applicationsInspectorViewModel)
+            BottomInformationBar(newsViewModel)
         }
+        */
     }
 }
 

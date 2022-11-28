@@ -21,10 +21,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 object RetrofitHelper {
 
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
-    fun getInstance(baseUrl: String, maxConnections: Int, requestHeader: Pair<String,String>): Retrofit {
+    fun getInstance(baseUrl: String): Retrofit {
 
         val dispatcher = Dispatcher()
-        dispatcher.maxRequests = maxConnections
+        //dispatcher.maxRequests = maxConnections
 
         val builder = OkHttpClient().newBuilder()
         builder.dispatcher(dispatcher)
@@ -37,12 +37,14 @@ object RetrofitHelper {
             builder.addInterceptor(interceptor)
         }
 
+        /*
         builder.addInterceptor { chain: Interceptor.Chain ->
             val request: Request = chain.request().newBuilder()
                 .addHeader(requestHeader.first, requestHeader.second)
                 .build()
             chain.proceed(request)
         }
+        */
 
         val client = builder.build()
 

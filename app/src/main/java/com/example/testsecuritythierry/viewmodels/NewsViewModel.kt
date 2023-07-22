@@ -52,7 +52,13 @@ class NewsViewModel @Inject constructor(
 
         owner.lifecycleScope.launch {
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                _uiState.emit(UiState.Filled)
+                listNews.collect {
+                    val newState = when (it.size) {
+                        0 -> UiState.Empty
+                        else -> UiState.Filled
+                    }
+                    _uiState.emit(newState)
+                }
             }
         }
         getNewsInLoop(owner)

@@ -6,7 +6,9 @@ import com.example.testsecuritythierry.config.analysisRefreshInterval
 import com.example.testsecuritythierry.models.DataNewsElement
 
 import com.example.testsecuritythierry.repositories.NewsDataRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 sealed class UiState {
     object Empty : UiState()
@@ -15,7 +17,8 @@ sealed class UiState {
     object Filled : UiState()
 }
 
-class NewsViewModel(
+@HiltViewModel
+class NewsViewModel @Inject constructor(
     private val newsDataRepository: NewsDataRepository,
 ) : ViewModel() {
 

@@ -9,8 +9,9 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.example.testsecuritythierry.ui.MainScreen
 import com.example.testsecuritythierry.ui.theme.TestSecurityThierryTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -43,6 +45,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    kapt {
+        correctErrorTypes true
+    }
     namespace 'com.example.testsecuritythierry'
 }
 
@@ -70,7 +75,11 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.7.2'
 
     // injection
-    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+    // Hilt is promotted by Google and it has better runtime performance than Koin
+    implementation "com.google.dagger:hilt-android:$dagger_version"
+    kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
+    implementation "androidx.hilt:hilt-navigation-compose:$hilt_version"
+    //implementation "io.insert-koin:koin-androidx-compose:$koin_version"
     //implementation "io.insert-koin:koin-core:$koin_version"
     //testImplementation "io.insert-koin:koin-test:$koin_version"
 

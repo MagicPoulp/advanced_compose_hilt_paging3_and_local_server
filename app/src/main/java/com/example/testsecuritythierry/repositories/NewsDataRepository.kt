@@ -1,19 +1,16 @@
 package com.example.testsecuritythierry.repositories
 
-import com.example.testsecuritythierry.config.*
-import com.example.testsecuritythierry.http.*
-import com.example.testsecuritythierry.models.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import org.koin.core.component.KoinComponent
-import java.util.*
-import kotlin.system.measureTimeMillis
+import com.example.testsecuritythierry.config.newsBaseUrl
+import com.example.testsecuritythierry.http.NewsApi
+import com.example.testsecuritythierry.http.RetrofitHelper
+import com.example.testsecuritythierry.models.DataNewsElement
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 const val oneMinute = 60 * 1000L
 
-class NewsDataRepository: KoinComponent {
+class NewsDataRepository @Inject constructor() {
 
     private lateinit var api: NewsApi
     private var initialized = false

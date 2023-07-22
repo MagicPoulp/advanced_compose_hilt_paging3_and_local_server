@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.http
+package com.example.testsecuritythierry.data.http
 
 
 import com.example.testsecuritythierry.BuildConfig

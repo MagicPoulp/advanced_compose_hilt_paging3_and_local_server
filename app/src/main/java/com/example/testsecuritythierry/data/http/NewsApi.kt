@@ -1,8 +1,8 @@
-package com.example.testsecuritythierry.http
+package com.example.testsecuritythierry.data.http
 
 // Retrofit interface
 
-import com.example.testsecuritythierry.models.DataNewsFull
+import com.example.testsecuritythierry.data.models.DataNewsFull
 import retrofit2.Response
 import retrofit2.http.GET
 

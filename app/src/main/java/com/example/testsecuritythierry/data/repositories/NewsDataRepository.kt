@@ -1,9 +1,9 @@
-package com.example.testsecuritythierry.repositories
+package com.example.testsecuritythierry.data.repositories
 
-import com.example.testsecuritythierry.config.newsBaseUrl
-import com.example.testsecuritythierry.http.NewsApi
-import com.example.testsecuritythierry.http.RetrofitHelper
-import com.example.testsecuritythierry.models.DataNewsElement
+import com.example.testsecuritythierry.data.config.newsBaseUrl
+import com.example.testsecuritythierry.data.http.NewsApi
+import com.example.testsecuritythierry.data.http.RetrofitHelper
+import com.example.testsecuritythierry.data.models.DataNewsElement
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

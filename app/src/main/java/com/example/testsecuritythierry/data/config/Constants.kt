@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.config
+package com.example.testsecuritythierry.data.config
 
 const val analysisRefreshInterval = 30*1000L
 

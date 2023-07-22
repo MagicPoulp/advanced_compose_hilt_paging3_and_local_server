@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.models
+package com.example.testsecuritythierry.data.models
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty

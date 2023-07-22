@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.ui
+package com.example.testsecuritythierry.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,9 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.testsecuritythierry.MainActivity
-import com.example.testsecuritythierry.viewmodels.NewsViewModel
-import com.example.testsecuritythierry.viewmodels.UiState
+import com.example.testsecuritythierry.ui.MainActivity
+import com.example.testsecuritythierry.ui.view_models.NewsViewModel
+import com.example.testsecuritythierry.ui.view_models.UiState
 
 @Composable
 fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),

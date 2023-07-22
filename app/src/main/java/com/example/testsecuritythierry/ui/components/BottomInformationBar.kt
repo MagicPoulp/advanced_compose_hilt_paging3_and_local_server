@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.ui
+package com.example.testsecuritythierry.ui.components
 
 /*
 import androidx.compose.foundation.layout.Arrangement

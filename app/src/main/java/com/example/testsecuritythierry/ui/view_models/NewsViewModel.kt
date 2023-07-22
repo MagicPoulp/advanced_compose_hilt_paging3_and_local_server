@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.viewmodels
+package com.example.testsecuritythierry.ui.view_models
 
 
 import androidx.lifecycle.Lifecycle
@@ -6,8 +6,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.testsecuritythierry.models.DataNewsElement
-import com.example.testsecuritythierry.repositories.NewsDataRepository
+import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.repositories.NewsDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

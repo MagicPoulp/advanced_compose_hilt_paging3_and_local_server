@@ -1,4 +1,4 @@
-package com.example.testsecuritythierry.ui
+package com.example.testsecuritythierry.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.testsecuritythierry.models.DataNewsElement
-import com.example.testsecuritythierry.viewmodels.NewsViewModel
+import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 import java.lang.Math.floor
 
 val horizontalMargin = 20.dp

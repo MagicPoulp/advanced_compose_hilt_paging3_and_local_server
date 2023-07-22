@@ -1,18 +1,19 @@
 package com.example.testsecuritythierry.ui.view_models
 
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.example.testsecuritythierry.data.config.pagingSize
 import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.repositories.NewsDataPagingSource
 import com.example.testsecuritythierry.data.repositories.NewsDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class UiState {
@@ -31,44 +32,32 @@ class NewsViewModel @Inject constructor(
     // the underscore is used to limit the access from outside this file
 
     // the list of packages installed on the device
-    var listNews: MutableStateFlow<List<DataNewsElement>> = MutableStateFlow(emptyList())
+    lateinit var listNews: Flow<PagingData<DataNewsElement>>
     // The UI state for showing the first page with a spinner or not
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
 
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
 
-
     // ------------------------------------------
-    // non LiveData variables
+    // non flow variables
     private var initialized = false
 
     // an init function is required to pass the string resource and the Activity lifecycle owner
-    fun init(owner: LifecycleOwner) {
+    fun init(unexpectedServerDataErrorString: String) {
         if (initialized) {
             return
         }
         initialized = true
 
-        owner.lifecycleScope.launch {
-            owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                listNews.collect {
-                    val newState = when (it.size) {
-                        0 -> UiState.Empty
-                        else -> UiState.Filled
-                    }
-                    _uiState.emit(newState)
-                }
-            }
-        }
-        getNewsInLoop(owner)
+        // one can add a RemoteMediator for caching
+        // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
+        listNews = Pager(PagingConfig(pageSize = pagingSize)) {
+            NewsDataPagingSource(unexpectedServerDataErrorString, newsDataRepository)
+        }.flow
     }
 
-    private fun getNewsInLoop(owner: LifecycleOwner) {
-        owner.lifecycleScope.launch {
-            newsDataRepository.getNews().collect { list ->
-                listNews.emit(list)
-            }
-        }
+    suspend fun setUiState(newUiState: UiState) {
+        _uiState.emit(newUiState)
     }
 }

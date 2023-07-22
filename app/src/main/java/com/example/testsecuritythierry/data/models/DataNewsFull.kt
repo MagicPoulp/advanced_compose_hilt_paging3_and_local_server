@@ -16,7 +16,7 @@ data class DataNewsFull(
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class DataNewsElement(
     @JsonProperty("titre")
-    val titre: String?,
+    var titre: String?,
     //@JsonProperty("id")
     val id: Int?,
     @JsonProperty("html")

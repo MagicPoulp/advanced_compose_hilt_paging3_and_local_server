@@ -13,7 +13,9 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -21,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.ui.MainActivity
 import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
@@ -34,7 +38,7 @@ fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),
     val screenHeight = configuration.screenHeightDp.dp
     val topAndBottomBarHeight = 80.dp
     newsViewModel.init(
-        owner = activity,
+        unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
     )
     Box(contentAlignment = Alignment.TopCenter,
         modifier = Modifier
@@ -58,11 +62,25 @@ fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),
             .align(alignment = Alignment.Center)
         ) {
             val state by newsViewModel.uiState.collectAsStateWithLifecycle()
+            val stateListNews = newsViewModel.listNews.collectAsLazyPagingItems()
             when (state) {
-                UiState.Filled -> TableWithAllNews(newsViewModel)
+                UiState.Filled -> TableWithAllNews(newsViewModel, stateListNews)
                 else -> Row {
                     ProgressIndicator()
                 }
+            }
+
+            // LazyPagingItems cannot collected in the ViewModel, but it can be in a LaunchedEffect
+            // https://developer.android.com/jetpack/compose/side-effects#snapshotFlow
+            LaunchedEffect(state) {
+                snapshotFlow { stateListNews.itemSnapshotList.count() }
+                    .collect {
+                        val newState = when (it) {
+                            0 -> UiState.Empty
+                            else -> UiState.Filled
+                        }
+                        newsViewModel.setUiState(newState)
+                    }
             }
         }
         /*

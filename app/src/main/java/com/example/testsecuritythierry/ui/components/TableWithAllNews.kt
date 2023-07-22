@@ -7,17 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataNewsElement
 import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 import java.lang.Math.floor
@@ -30,8 +29,8 @@ val statusAreaWidth = (floor(goldenNumber * 60)).dp
 @Composable
 fun TableWithAllNews(
     newsViewModel: NewsViewModel,
+    stateListNews: LazyPagingItems<DataNewsElement>
 ) {
-    val state by newsViewModel.listNews.collectAsStateWithLifecycle()
     // keep the scrolling state upon screen rotation
     val listState = rememberLazyListState()
     LazyColumn(
@@ -39,10 +38,16 @@ fun TableWithAllNews(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = horizontalMargin),
     ) {
-        state?.let {
-            items(it.toList()) { item ->
-                TableItemRow(item) //, newsViewModel)
-            }
+        // as stated at the link below, items(stateListNews.itemSnapshotList) does not work with pagingSize = 10, and total items = 48
+        // but it works using the itemsIndex alternative
+        // https://stackoverflow.com/questions/75960184/why-jetpack-compose-room-offline-pagination-not-loading-next-page
+        //items(stateListNews.itemSnapshotList) {item ->
+        //item?.let {
+        //    TableItemRow(item)
+        //}
+        //}
+        itemsIndexed(stateListNews.itemSnapshotList) { index, _ ->
+            stateListNews[index]?.let { TableItemRow(it) }
         }
     }
 }

@@ -1,0 +1,17 @@
+https://aec.lemonde.fr/ws/8/mobile/www/android-phone/en_continu/index.json
+ - Télécharger la liste. Ignorer les données inutiles pour le test.
+
+ - Prendre le contenu de la clé "elements" et filtrer les éléments sans titre
+
+ - Afficher les titres des éléments dans une liste
+
+ - Au clic, afficher le contenu de "html" dans une webview (optionnel)
+
+
+
+ - Respecter les best practices
+
+ - Il s'agit de la 1ère brique d'un projet qui va évoluer
+
+ - Me transmettre le code à la fin du test en répondant à ce mail
+

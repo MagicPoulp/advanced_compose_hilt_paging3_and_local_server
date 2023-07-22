@@ -1,13 +1,18 @@
 package com.example.testsecuritythierry.viewmodels
 
 
-import androidx.lifecycle.*
-import com.example.testsecuritythierry.config.analysisRefreshInterval
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.testsecuritythierry.models.DataNewsElement
-
 import com.example.testsecuritythierry.repositories.NewsDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class UiState {
@@ -26,16 +31,17 @@ class NewsViewModel @Inject constructor(
     // the underscore is used to limit the access from outside this file
 
     // the list of packages installed on the device
-    var listNews: MutableLiveData<MutableList<DataNewsElement>> = MutableLiveData<MutableList<DataNewsElement>>()
+    var listNews: MutableStateFlow<List<DataNewsElement>> = MutableStateFlow(emptyList())
     // The UI state for showing the first page with a spinner or not
-    private val _uiState = MutableLiveData<UiState>(UiState.Empty)
-    val uiState: LiveData<UiState>
-        get() = _uiState
+    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
+
+    val uiState: StateFlow<UiState>
+        get() = _uiState.asStateFlow()
 
 
     // ------------------------------------------
     // non LiveData variables
-    var initialized = false
+    private var initialized = false
 
     // an init function is required to pass the string resource and the Activity lifecycle owner
     fun init(owner: LifecycleOwner) {
@@ -44,42 +50,19 @@ class NewsViewModel @Inject constructor(
         }
         initialized = true
 
-        // any update on the list of packages is observed
-        listNews.observe(owner) { // allNews ->
-            /*
-            // The UI has one status indicator for each package
-            // set all statuses as pending
-            mapAppToVirusStatus = mutableMapOf()
-            allPackages.toList().forEach { packageInfo ->
-                mapAppToVirusStatus[packageInfo.packageName]?.let {
-                    it.postValue(AnalysisResultPending())
-                } ?: run {
-                    // we create the observables only if they do not exist
-                    mapAppToVirusStatus[packageInfo.packageName] =
-                        MutableLiveData(AnalysisResultPending())
-                }
+        owner.lifecycleScope.launch {
+            owner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                _uiState.emit(UiState.Filled)
             }
-            // reset counters
-            _numUnfinished.value = allPackages.size
-            _numViruses.value = 0
-            // this triggers a display of the first list of packages
-            _uiState.value = UiState.Filled
-            */
-
-            _uiState.value = UiState.Filled
         }
-        getNewsInLoop()
+        getNewsInLoop(owner)
     }
 
-    // every 30 seconds, we try to update the list of packages
-    private fun getNewsInLoop(){
-        viewModelScope.launch {
-            //while (true) {
-                newsDataRepository.getNews().collect { list ->
-                    listNews.postValue(list.toMutableList())
-                }
-            //    delay(analysisRefreshInterval)
-            //}
+    private fun getNewsInLoop(owner: LifecycleOwner) {
+        owner.lifecycleScope.launch {
+            newsDataRepository.getNews().collect { list ->
+                listNews.emit(list)
+            }
         }
     }
 }

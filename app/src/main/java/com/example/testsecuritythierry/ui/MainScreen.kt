@@ -14,13 +14,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.testsecuritythierry.MainActivity
 import com.example.testsecuritythierry.viewmodels.NewsViewModel
 import com.example.testsecuritythierry.viewmodels.UiState
@@ -57,7 +57,7 @@ fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),
             .fillMaxWidth()
             .align(alignment = Alignment.Center)
         ) {
-            val state by newsViewModel.uiState.observeAsState()
+            val state by newsViewModel.uiState.collectAsStateWithLifecycle()
             when (state) {
                 UiState.Filled -> TableWithAllNews(newsViewModel)
                 else -> Row {

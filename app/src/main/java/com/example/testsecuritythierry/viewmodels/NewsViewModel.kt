@@ -42,7 +42,7 @@ class NewsViewModel(
         initialized = true
 
         // any update on the list of packages is observed
-        listNews.observe(owner) { allNews ->
+        listNews.observe(owner) { // allNews ->
             /*
             // The UI has one status indicator for each package
             // set all statuses as pending

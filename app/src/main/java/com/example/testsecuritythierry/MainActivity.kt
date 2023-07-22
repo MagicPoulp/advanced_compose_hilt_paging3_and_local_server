@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TestSecurityThierryTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    MainScreen(packageManager = packageManager, activity = this)
+                    MainScreen(activity = this)
                 }
             }
         }

@@ -23,8 +23,7 @@ import com.example.testsecuritythierry.viewmodels.UiState
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun MainScreen(packageManager: PackageManager,
-               newsViewModel: NewsViewModel = getViewModel(),
+fun MainScreen(newsViewModel: NewsViewModel = getViewModel(),
                activity: MainActivity
 ) {
     //val numUnfinished by newsViewModel.numUnfinished.observeAsState()

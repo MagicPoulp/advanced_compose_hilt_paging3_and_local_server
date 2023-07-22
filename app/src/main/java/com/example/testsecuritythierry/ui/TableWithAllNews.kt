@@ -33,14 +33,16 @@ fun TableWithAllNews(
     ) {
         state?.let {
             items(it.toList()) { item ->
-                TableItemRow(item, newsViewModel)
+                TableItemRow(item) //, newsViewModel)
             }
         }
     }
 }
 
 @Composable
-fun TableItemRow(item: DataNewsElement, newsViewModel: NewsViewModel) {
+fun TableItemRow(item: DataNewsElement,
+                 //newsViewModel: NewsViewModel
+) {
     Box(
         modifier = Modifier
             .height(rowHeight),

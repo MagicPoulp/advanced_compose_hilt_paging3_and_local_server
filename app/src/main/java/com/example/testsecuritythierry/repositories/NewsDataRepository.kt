@@ -15,11 +15,6 @@ class NewsDataRepository @Inject constructor() {
     private lateinit var api: NewsApi
     private var initialized = false
 
-    fun init() {
-        //virusTotalRawApiKey = virusTotalRawApiKeyIn
-        createApi()
-    }
-
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
             baseUrl = newsBaseUrl,

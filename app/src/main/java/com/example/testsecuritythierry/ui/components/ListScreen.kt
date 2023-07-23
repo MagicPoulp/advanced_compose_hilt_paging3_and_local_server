@@ -32,7 +32,6 @@ val statusAreaWidth = (floor(goldenNumber * 60)).dp
 
 @Composable
 fun ListScreen(
-    //newsViewModel: MainScreenNewsViewModel,
     stateListNews: LazyPagingItems<DataNewsElement>,
     navController: NavController,
 ) {

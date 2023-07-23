@@ -87,7 +87,7 @@ fun NavigationScreen(
                 {
                     0
                 }
-                DetailScreen(rowId)
+                DetailScreen(stateListNews = stateListNews, rowId = rowId)
             }
         }
     }

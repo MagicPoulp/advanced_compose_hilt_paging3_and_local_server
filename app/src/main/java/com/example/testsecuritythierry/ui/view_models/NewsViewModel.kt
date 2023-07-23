@@ -1,7 +1,9 @@
 package com.example.testsecuritythierry.ui.view_models
 
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class UiState {
@@ -31,14 +34,15 @@ class NewsViewModel @Inject constructor(
     lateinit var listNews: Flow<PagingData<DataNewsElement>>
     // The UI state for showing the first page with a spinner or not
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Empty)
-
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
+    private val _activeRow: MutableStateFlow<Int> = MutableStateFlow(-1)
+    val activeRow: StateFlow<Int>
+        get() = _activeRow.asStateFlow()
 
     // ------------------------------------------
     // non flow variables
     private var initialized = false
-    var activeRow = 0
 
     fun init(unexpectedServerDataErrorString: String) {
         if (initialized) {
@@ -51,6 +55,12 @@ class NewsViewModel @Inject constructor(
         listNews = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
             NewsDataPagingSource(unexpectedServerDataErrorString, localNewsDataRepository)
         }.flow
+    }
+
+    fun setActiveRow(owner: LifecycleOwner, rowId: Int) {
+        owner.lifecycleScope.launch {
+            _activeRow.emit(rowId)
+        }
     }
 
     suspend fun setUiState(newUiState: UiState) {

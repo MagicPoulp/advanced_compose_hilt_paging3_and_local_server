@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +33,7 @@ val statusAreaWidth = (floor(goldenNumber * 60)).dp
 
 @Composable
 fun ListScreen(
+    activeRow: Int,
     stateListNews: LazyPagingItems<DataNewsElement>,
     navController: NavController,
 ) {
@@ -55,7 +57,7 @@ fun ListScreen(
             //}
             //}
             itemsIndexed(stateListNews.itemSnapshotList) { index, _ ->
-                stateListNews[index]?.let { TableItemRow(it, index, navController) }
+                stateListNews[index]?.let { TableItemRow(activeRow = activeRow, item = it, index = index, navController = navController) }
             }
         }
     }
@@ -63,10 +65,14 @@ fun ListScreen(
 
 @Composable
 fun TableItemRow(
+    activeRow: Int,
     item: DataNewsElement, index: Int, navController: NavController,
 ) {
+    //val activeRow = newsViewModel.activeRow.collectAsStateWithLifecycle()
+    val isPreviousActiveRow = index == activeRow
     Box(
         modifier = Modifier
+            .background(color = if (isPreviousActiveRow) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
             .height(rowHeight),
         contentAlignment = Alignment.Center) {
         Box(

@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.ui.components
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,14 +21,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testsecuritythierry.R
-import com.example.testsecuritythierry.ui.MainActivity
 import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
 
 @Composable
 fun UiStateScreen(
     newsViewModel: NewsViewModel = hiltViewModel(),
-    activity: MainActivity,
+    activity: ComponentActivity,
 ) {
     newsViewModel.init(
         unexpectedServerDataErrorString = activity.resources.getString(R.string.unexpected_server_data)
@@ -43,7 +43,7 @@ fun UiStateScreen(
             val state by newsViewModel.uiState.collectAsStateWithLifecycle()
             val stateListNews = newsViewModel.listNews.collectAsLazyPagingItems()
             when (state) {
-                UiState.Filled -> NavigationScreen(stateListNews = stateListNews)
+                UiState.Filled -> NavigationScreen(activity = activity, stateListNews = stateListNews)
                 else -> Row {
                     ProgressIndicator()
                 }

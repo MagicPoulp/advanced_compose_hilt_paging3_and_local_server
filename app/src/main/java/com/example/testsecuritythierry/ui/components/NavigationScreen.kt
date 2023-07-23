@@ -1,5 +1,6 @@
 package com.example.testsecuritythierry.ui.components
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -10,9 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -23,9 +26,12 @@ import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataNewsElement
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
 import com.example.testsecuritythierry.ui.view_models.NewsViewModel
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NavigationScreen(
+    activity: ComponentActivity,
     stateListNews: LazyPagingItems<DataNewsElement>,
     newsViewModel: NewsViewModel = hiltViewModel(),
 ) {
@@ -34,6 +40,7 @@ fun NavigationScreen(
         RoutingScreen.MyListScreen,
         RoutingScreen.MyDetailScreen,
     )
+    val activeRow = newsViewModel.activeRow.collectAsStateWithLifecycle()
     Scaffold(
         bottomBar = {
             BottomNavigation {
@@ -78,21 +85,27 @@ fun NavigationScreen(
         ) {
             composable(RoutingScreen.MyListScreen.route) {
                 ListScreen(
+                    activeRow = activeRow.value,
                     stateListNews = stateListNews,
                     navController = navController
                 )
             }
+            // anomaly: as reported in this stack overflow, navigating, recomposes twice
+            // https://stackoverflow.com/questions/69190119/jetpack-compose-recompose-with-success-state-twice-when-exiting-current-composab?noredirect=1&lq=1
             composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
-                val previousRow = newsViewModel.activeRow
+                val previousRow = if (activeRow.value != -1) activeRow.value else 0
                 val rowId = try {
                     backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
-                }
-                catch (_: Exception)
-                {
+                } catch (_: Exception) {
                     previousRow
                 }
-                newsViewModel.activeRow = rowId
                 DetailScreen(stateListNews = stateListNews, rowId = rowId)
+                LaunchedEffect(Unit) {
+                    delay(300.milliseconds)
+                    if (rowId != activeRow.value) {
+                        newsViewModel.setActiveRow(owner = activity, rowId = rowId)
+                    }
+                }
             }
         }
     }

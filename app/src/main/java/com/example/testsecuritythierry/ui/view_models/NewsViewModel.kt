@@ -38,6 +38,7 @@ class NewsViewModel @Inject constructor(
     // ------------------------------------------
     // non flow variables
     private var initialized = false
+    var activeRow = 0
 
     fun init(unexpectedServerDataErrorString: String) {
         if (initialized) {

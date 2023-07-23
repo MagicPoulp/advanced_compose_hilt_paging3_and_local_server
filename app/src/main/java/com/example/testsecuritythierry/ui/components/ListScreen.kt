@@ -62,7 +62,8 @@ fun ListScreen(
 }
 
 @Composable
-fun TableItemRow(item: DataNewsElement, index: Int, navController: NavController
+fun TableItemRow(
+    item: DataNewsElement, index: Int, navController: NavController,
 ) {
     Box(
         modifier = Modifier

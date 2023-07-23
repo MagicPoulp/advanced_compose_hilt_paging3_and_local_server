@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -21,10 +22,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataNewsElement
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
+import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 
 @Composable
 fun NavigationScreen(
     stateListNews: LazyPagingItems<DataNewsElement>,
+    newsViewModel: NewsViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -80,13 +83,15 @@ fun NavigationScreen(
                 )
             }
             composable(RoutingScreen.MyDetailScreen.route) { backStackEntry ->
+                val previousRow = newsViewModel.activeRow
                 val rowId = try {
-                    backStackEntry.arguments?.getString("rowId")?.toInt() ?: 0
+                    backStackEntry.arguments?.getString("rowId")?.toInt() ?: previousRow
                 }
                 catch (_: Exception)
                 {
-                    0
+                    previousRow
                 }
+                newsViewModel.activeRow = rowId
                 DetailScreen(stateListNews = stateListNews, rowId = rowId)
             }
         }

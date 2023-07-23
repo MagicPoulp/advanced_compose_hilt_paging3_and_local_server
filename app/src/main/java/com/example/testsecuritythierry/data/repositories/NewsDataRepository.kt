@@ -6,13 +6,16 @@ import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.http.NewsApi
 import com.example.testsecuritythierry.data.http.RetrofitHelper
 import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.domain.ExtractDataNewsUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-class NewsDataRepository @Inject constructor() {
+class NewsDataRepository @Inject constructor(
+    val extractDataNewsUseCase: ExtractDataNewsUseCase
+) {
 
     private lateinit var api: NewsApi
     private var initialized = false
@@ -33,7 +36,7 @@ class NewsDataRepository @Inject constructor() {
             }
             val response = api.getNews()
             if (response.isSuccessful) {
-                response.body()?.let { emit(it.elements.filter { it2 -> it2.titre != null }) }
+                response.body()?.let { emit(extractDataNewsUseCase(it)) }
                 return@flow
             }
         }.stateIn(

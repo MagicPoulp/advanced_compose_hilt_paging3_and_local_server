@@ -1,14 +1,16 @@
 package com.example.testsecuritythierry.data.repositories
 
-import com.example.testsecuritythierry.data.config.newsBaseUrl
-import com.example.testsecuritythierry.data.custom_structures.ResultOf
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.http.NewsApi
 import com.example.testsecuritythierry.data.http.RetrofitHelper
 import com.example.testsecuritythierry.data.models.DataNewsElement
-import com.example.testsecuritythierry.ui.setup.safeSubList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-
-const val oneMinute = 60 * 1000L
 
 class NewsDataRepository @Inject constructor() {
 
@@ -17,40 +19,29 @@ class NewsDataRepository @Inject constructor() {
 
     private fun createApi() = run {
         api = RetrofitHelper.getInstance(
-            baseUrl = newsBaseUrl,
-            //requestHeader = Pair(first = "x-apikey", second = virusTotalApiKey)
+            baseUrl = AppConfig.newsBaseUrl,
+            okHttpClient = null,
+            requestHeaders = null
         ).create(NewsApi::class.java)
     }
 
-    /*
-    fun getNewsFlow(pageSize: Int, pageOffset: Int): Flow<List<DataNewsElement>> = flow {
-        if (!initialized) {
-            initialized = true
-            createApi()
-        }
-        val response = api.getNews(pageSize, pageOffset)
-        if (response.isSuccessful) {
-            response.body()?.let { emit(it.elements.filter { it2 -> it2.titre != null }) }
-            return@flow
-        }
-    }*/
-
-    suspend fun getNewsPaged(pageSize: Int, pageOffset: Int): ResultOf<List<DataNewsElement>> {
-        try {
+    fun getNewsFlow(owner: LifecycleOwner): Flow<List<DataNewsElement>> {
+        return flow {
             if (!initialized) {
                 initialized = true
                 createApi()
             }
-            val response = api.getNewsPaged(pageSize, pageOffset)
+            val response = api.getNews()
             if (response.isSuccessful) {
-                response.body()?.let {
-                    return ResultOf.Success(it.elements.filter { it2 -> it2.titre != null }
-                    .safeSubList((pageOffset - 1) * pageSize, pageOffset * pageSize)) }
+                response.body()?.let { emit(it.elements.filter { it2 -> it2.titre != null }) }
+                return@flow
             }
-            return ResultOf.Failure(response.message(), null)
-        } catch (e: Exception) {
-            return ResultOf.Failure(e.message, e)
-        }
+        }.stateIn(
+            scope = owner.lifecycleScope,
+            // to pause when in the background but not when rotating
+            started = WhileSubscribed(500),
+            initialValue = emptyList()
+        )
     }
 
 }

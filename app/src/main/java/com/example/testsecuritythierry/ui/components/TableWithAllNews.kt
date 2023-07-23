@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataNewsElement
-import com.example.testsecuritythierry.ui.view_models.NewsViewModel
 import java.lang.Math.floor
 
 val horizontalMargin = 20.dp
@@ -28,7 +27,7 @@ val statusAreaWidth = (floor(goldenNumber * 60)).dp
 
 @Composable
 fun TableWithAllNews(
-    newsViewModel: NewsViewModel,
+    //newsViewModel: MainScreenNewsViewModel,
     stateListNews: LazyPagingItems<DataNewsElement>
 ) {
     // keep the scrolling state upon screen rotation
@@ -38,7 +37,7 @@ fun TableWithAllNews(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = horizontalMargin),
     ) {
-        // as stated at the link below, items(stateListNews.itemSnapshotList) does not work with pagingSize = 10, and total items = 48
+        // as stated at the link below, items(stateListNews.itemSnapshotList) does not work with AppConfig.pagingSize = 10, and total items = 48
         // but it works using the itemsIndex alternative
         // https://stackoverflow.com/questions/75960184/why-jetpack-compose-room-offline-pagination-not-loading-next-page
         //items(stateListNews.itemSnapshotList) {item ->

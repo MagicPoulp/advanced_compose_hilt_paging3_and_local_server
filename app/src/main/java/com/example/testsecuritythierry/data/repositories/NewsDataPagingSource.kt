@@ -2,19 +2,19 @@ package com.example.testsecuritythierry.data.repositories
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.testsecuritythierry.data.config.pagingSize
+import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.custom_structures.ResultOf
 import com.example.testsecuritythierry.data.models.DataNewsElement
 
 // https://betterprogramming.pub/turn-the-page-overview-of-android-paging3-library-integration-with-jetpack-compose-3a7881ed75b4
 class NewsDataPagingSource (
     private val unexpectedServerDataErrorString: String,
-    private val newsDataRepository: NewsDataRepository
+    private val localNewsDataRepository: LocalNewsDataRepository
 ) : PagingSource<Int, DataNewsElement>() {
 
     override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataNewsElement> {
         val nextPageNumber = params.key ?: 1
-        val response = newsDataRepository.getNewsPaged(pagingSize, nextPageNumber)
+        val response = localNewsDataRepository.getNewsPaged(AppConfig.pagingSize, nextPageNumber)
         return when (response) {
             is ResultOf.Success -> {
                 LoadResult.Page(

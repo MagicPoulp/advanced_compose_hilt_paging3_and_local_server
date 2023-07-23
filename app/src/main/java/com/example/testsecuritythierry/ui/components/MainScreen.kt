@@ -26,11 +26,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.testsecuritythierry.R
 import com.example.testsecuritythierry.ui.MainActivity
-import com.example.testsecuritythierry.ui.view_models.NewsViewModel
+import com.example.testsecuritythierry.ui.view_models.MainScreenNewsViewModel
 import com.example.testsecuritythierry.ui.view_models.UiState
 
 @Composable
-fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),
+fun MainScreen(newsViewModel: MainScreenNewsViewModel = hiltViewModel(),
                activity: MainActivity
 ) {
     //val numUnfinished by newsViewModel.numUnfinished.observeAsState()
@@ -64,7 +64,7 @@ fun MainScreen(newsViewModel: NewsViewModel = hiltViewModel(),
             val state by newsViewModel.uiState.collectAsStateWithLifecycle()
             val stateListNews = newsViewModel.listNews.collectAsLazyPagingItems()
             when (state) {
-                UiState.Filled -> TableWithAllNews(newsViewModel, stateListNews)
+                UiState.Filled -> TableWithAllNews(stateListNews)
                 else -> Row {
                     ProgressIndicator()
                 }

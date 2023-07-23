@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.testsecuritythierry.data.config.pagingSize
+import com.example.testsecuritythierry.data.config.AppConfig
 import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.data.repositories.LocalNewsDataRepository
 import com.example.testsecuritythierry.data.repositories.NewsDataPagingSource
-import com.example.testsecuritythierry.data.repositories.NewsDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,13 +24,9 @@ sealed class UiState {
 }
 
 @HiltViewModel
-class NewsViewModel @Inject constructor(
-    private val newsDataRepository: NewsDataRepository,
+class MainScreenNewsViewModel @Inject constructor(
+    private val localNewsDataRepository: LocalNewsDataRepository,
 ) : ViewModel() {
-
-    // LiveData are observed in the UI
-    // the underscore is used to limit the access from outside this file
-
     // the list of packages installed on the device
     lateinit var listNews: Flow<PagingData<DataNewsElement>>
     // The UI state for showing the first page with a spinner or not
@@ -43,7 +39,6 @@ class NewsViewModel @Inject constructor(
     // non flow variables
     private var initialized = false
 
-    // an init function is required to pass the string resource and the Activity lifecycle owner
     fun init(unexpectedServerDataErrorString: String) {
         if (initialized) {
             return
@@ -52,8 +47,8 @@ class NewsViewModel @Inject constructor(
 
         // one can add a RemoteMediator for caching
         // https://developer.android.com/topic/libraries/architecture/paging/v3-network-db
-        listNews = Pager(PagingConfig(pageSize = pagingSize)) {
-            NewsDataPagingSource(unexpectedServerDataErrorString, newsDataRepository)
+        listNews = Pager(PagingConfig(pageSize = AppConfig.pagingSize)) {
+            NewsDataPagingSource(unexpectedServerDataErrorString, localNewsDataRepository)
         }.flow
     }
 

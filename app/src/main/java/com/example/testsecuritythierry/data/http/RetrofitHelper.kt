@@ -2,6 +2,7 @@ package com.example.testsecuritythierry.data.http
 
 
 import com.example.testsecuritythierry.BuildConfig
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -10,7 +11,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 
 // https://www.geeksforgeeks.org/retrofit-with-kotlin-coroutine-in-android/
@@ -21,12 +21,15 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 object RetrofitHelper {
 
     // we can specify the base url, the max number of concurrent connections, and an extra API key header
-    fun getInstance(baseUrl: String): Retrofit {
+    fun getInstance(baseUrl: String, okHttpClient: OkHttpClient?, requestHeaders: List<Pair<String, String>>?): Retrofit {
 
         val dispatcher = Dispatcher()
         //dispatcher.maxRequests = maxConnections
 
-        val builder = OkHttpClient().newBuilder()
+        val builder = when(okHttpClient) {
+            null -> OkHttpClient()
+            else -> okHttpClient
+        }.newBuilder()
         builder.dispatcher(dispatcher)
         builder.readTimeout(8, TimeUnit.SECONDS)
         builder.connectTimeout(8, TimeUnit.SECONDS)
@@ -37,14 +40,15 @@ object RetrofitHelper {
             builder.addInterceptor(interceptor)
         }
 
-        /*
-        builder.addInterceptor { chain: Interceptor.Chain ->
-            val request: Request = chain.request().newBuilder()
-                .addHeader(requestHeader.first, requestHeader.second)
-                .build()
-            chain.proceed(request)
+        requestHeaders?.let {
+            builder.addInterceptor { chain: Interceptor.Chain ->
+                val request: Request.Builder = chain.request().newBuilder()
+                requestHeaders.forEach {
+                    request.addHeader(it.first, it.second)
+                }
+                chain.proceed(request.build())
+            }
         }
-        */
 
         val client = builder.build()
 

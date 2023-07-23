@@ -2,6 +2,7 @@ package com.example.testsecuritythierry.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,7 +15,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import com.example.testsecuritythierry.data.models.DataNewsElement
+import com.example.testsecuritythierry.ui.reusable_components.LeftAlignedText
 import com.example.testsecuritythierry.ui.setup.RoutingScreen
 import java.lang.Math.floor
 
@@ -75,18 +76,13 @@ fun TableItemRow(
             .background(color = if (isPreviousActiveRow) MaterialTheme.colors.primary else MaterialTheme.colors.secondary)
             .height(rowHeight),
         contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Row(
-                modifier = Modifier.clickable {
-                    navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
-                }
-            ) {
-                item.titre?.let { Text(text = it) }
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.clickable {
+                navController.navigate(RoutingScreen.MyDetailScreen.route.replace("{rowId}", "$index"))
             }
+        ) {
+            item.titre?.let { LeftAlignedText(text = it) }
         }
         Divider(
             color = Color.White,

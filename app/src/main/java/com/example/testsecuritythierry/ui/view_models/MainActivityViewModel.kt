@@ -114,6 +114,8 @@ class MainActivityViewModel @Inject constructor(
                         routing {
                             get("/news") {
                                 try {
+                                    // sleep to show the loading icon at the start
+                                    Thread.sleep(1000)
                                     val pageSize: Int =
                                         call.request.queryParameters["pageSize"]?.toInt() ?: -1
                                     val pageOffset: Int =

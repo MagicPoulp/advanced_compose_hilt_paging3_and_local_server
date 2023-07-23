@@ -24,7 +24,7 @@ sealed class UiState {
 }
 
 @HiltViewModel
-class MainScreenNewsViewModel @Inject constructor(
+class NewsViewModel @Inject constructor(
     private val localNewsDataRepository: LocalNewsDataRepository,
 ) : ViewModel() {
     // the list of packages installed on the device

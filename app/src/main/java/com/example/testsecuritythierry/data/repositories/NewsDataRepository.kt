@@ -43,15 +43,8 @@ class NewsDataRepository @Inject constructor() {
             }
             val response = api.getNewsPaged(pageSize, pageOffset)
             if (response.isSuccessful) {
-                // we changed the filtering to use paging because we need the right size for the page
-                //response.body()?.let { return ResultOf.Success(it.elements.filter { it2 -> it2.titre != null }
                 response.body()?.let {
-                    return ResultOf.Success(it.elements.map { it2 ->
-                        if (it2.titre == null) {
-                            it2.titre = "--"
-                        }
-                        it2
-                    }
+                    return ResultOf.Success(it.elements.filter { it2 -> it2.titre != null }
                     .safeSubList((pageOffset - 1) * pageSize, pageOffset * pageSize)) }
             }
             return ResultOf.Failure(response.message(), null)

@@ -13,7 +13,7 @@ class NewsDataPagingSource (
 ) : PagingSource<Int, DataNewsElement>() {
 
     override suspend fun load(params: LoadParams<Int>):  LoadResult<Int, DataNewsElement> {
-        val nextPageNumber = params.key ?: 1
+        val nextPageNumber = params.key ?: 0
         val response = localNewsDataRepository.getNewsPaged(AppConfig.pagingSize, nextPageNumber)
         return when (response) {
             is ResultOf.Success -> {
